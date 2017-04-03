@@ -11,11 +11,12 @@ class Riemann::Tools::NvidiaGpuStats
   end
 
   def report_metric(gpu_index, metric_name, metric_value)
-    report(
-           :service => "gpu.#{gpu_index}.#{metric_name}",
-           :metric => metric_value,
-           :state => :ok,
-           :tags => ['riemann-nvidia-gpu', 'riemann'])
+#    report(
+#           :service => "gpu.#{gpu_index}.#{metric_name}",
+#           :metric => metric_value,
+#           :state => :ok,
+#           :tags => ['riemann-nvidia-gpu', 'riemann'])
+    puts "#{gpu_index} #{metric_name} #{metric_value}"
   end
 
   def tick
@@ -25,17 +26,31 @@ class Riemann::Tools::NvidiaGpuStats
     end
 
     if not nvidia_smi_output.nil?
+      utilization_gpu = 0
+      utilization_memory = 0
+      memory_used_mb = 0
+      memory_total_mb = 0
+
       nvidia_smi_output.split("\n").each do |gpu_line|
         gpu_line.match(/(\d+), (\d+) %, (\d+) %, (\d+) MiB, (\d+) MiB/) do |m|
           report_metric(m[1], "utilization.gpu", m[2].to_f / 100)
           report_metric(m[1], "utilization.memory", m[3].to_f / 100)
           report_metric(m[1], "memory.used_mb", m[4])
           report_metric(m[1], "memory.used", m[4].to_f / m[5].to_f)
+
+          utilization_gpu = utilization_gpu + m[2].to_i
+          utilization_memory = utilization_memory + m[3].to_i
+          memory_used_mb = memory_used_mb + m[4].to_i
+          memory_total_mb = memory_total_mb + m[5].to_i
         end
-      end
+       end
+
+      report_metric("total", "utilization.gpu", utilization_gpu.to_f / 100)
+      report_metric("total", "utilization.memory", utilization_memory.to_f / 100)
+      report_metric("total", "memory.used_mb", memory_used_mb.to_f / 100)
+      report_metric("total", "memory.used", memory_used_mb.to_f / memory_total_mb.to_f)
     end
   end
 end
 
-Riemann::Tools::NvidiaGpuStats.run
-
+Riemann::Tools::NvidiaGpuStats.new.tick
