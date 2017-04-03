@@ -11,12 +11,11 @@ class Riemann::Tools::NvidiaGpuStats
   end
 
   def report_metric(gpu_index, metric_name, metric_value)
-#    report(
-#           :service => "gpu.#{gpu_index}.#{metric_name}",
-#           :metric => metric_value,
-#           :state => :ok,
-#           :tags => ['riemann-nvidia-gpu', 'riemann'])
-    puts "#{gpu_index} #{metric_name} #{metric_value}"
+    report(
+           :service => "gpu.#{gpu_index}.#{metric_name}",
+           :metric => metric_value,
+           :state => :ok,
+           :tags => ['riemann-nvidia-gpu', 'riemann'])
   end
 
   def tick
@@ -53,4 +52,4 @@ class Riemann::Tools::NvidiaGpuStats
   end
 end
 
-Riemann::Tools::NvidiaGpuStats.new.tick
+Riemann::Tools::NvidiaGpuStats.run
