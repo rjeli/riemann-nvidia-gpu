@@ -51,7 +51,7 @@ class Riemann::Tools::NvidiaGpuStats
       if gpu_count != 0
         report_metric("total", "utilization.gpu", (utilization_gpu.to_f / gpu_count.to_f) / 100)
         report_metric("total", "utilization.memory", (utilization_memory.to_f / gpu_count.to_f) / 100)
-        report_metric("total", "memory.used_mb", memory_used_mb.to_f / 100)
+        report_metric("total", "memory.used_mb", memory_used_mb.to_f)
         report_metric("total", "memory.used", memory_used_mb.to_f / memory_total_mb.to_f)
       end
     end
