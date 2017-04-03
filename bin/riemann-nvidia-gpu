@@ -37,10 +37,10 @@ class Riemann::Tools::NvidiaGpuStats
           report_metric(m[1], "memory.used_mb", m[4])
           report_metric(m[1], "memory.used", m[4].to_f / m[5].to_f)
 
-          utilization_gpu = utilization_gpu + m[2].to_i
-          utilization_memory = utilization_memory + m[3].to_i
-          memory_used_mb = memory_used_mb + m[4].to_i
-          memory_total_mb = memory_total_mb + m[5].to_i
+          utilization_gpu += m[2].to_i
+          utilization_memory += m[3].to_i
+          memory_used_mb += m[4].to_i
+          memory_total_mb += m[5].to_i
         end
        end
 
