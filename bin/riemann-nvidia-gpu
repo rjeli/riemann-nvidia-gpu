@@ -30,6 +30,8 @@ class Riemann::Tools::NvidiaGpuStats
       memory_used_mb = 0
       memory_total_mb = 0
 
+      gpu_count = 0
+
       nvidia_smi_output.split("\n").each do |gpu_line|
         gpu_line.match(/(\d+), (\d+) %, (\d+) %, (\d+) MiB, (\d+) MiB/) do |m|
           report_metric(m[1], "utilization.gpu", m[2].to_f / 100)
@@ -41,13 +43,17 @@ class Riemann::Tools::NvidiaGpuStats
           utilization_memory += m[3].to_i
           memory_used_mb += m[4].to_i
           memory_total_mb += m[5].to_i
+
+          gpu_count += 1
         end
        end
 
-      report_metric("total", "utilization.gpu", utilization_gpu.to_f / 100)
-      report_metric("total", "utilization.memory", utilization_memory.to_f / 100)
-      report_metric("total", "memory.used_mb", memory_used_mb.to_f / 100)
-      report_metric("total", "memory.used", memory_used_mb.to_f / memory_total_mb.to_f)
+      if gpu_count != 0
+        report_metric("total", "utilization.gpu", (utilization_gpu.to_f / gpu_count.to_f) / 100)
+        report_metric("total", "utilization.memory", (utilization_memory.to_f / gpu_count.to_f) / 100)
+        report_metric("total", "memory.used_mb", memory_used_mb.to_f / 100)
+        report_metric("total", "memory.used", memory_used_mb.to_f / memory_total_mb.to_f)
+      end
     end
   end
 end
